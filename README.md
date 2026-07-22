@@ -233,7 +233,7 @@ Proyek ini dilisensikan di bawah **MIT License** — lihat file [LICENSE](LICENS
 
 <div align="center">
 
-Made with ❤️ by **Nugroho Saputra Jati** | Universitas Duta Bangsa Surakarta — Pemrograman Mobile Semester 4
+Made with ❤️ by **Nugroho Saputra Jati** | Universitas Duta Bangsa Surakarta — Pemrograman Mobile Semester 4 - Angkatan 24
 
 *🪷 Lilypad — Tetap terorganisir, tetap produktif | Stay organized, stay productive*
 
