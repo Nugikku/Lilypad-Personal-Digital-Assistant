@@ -15,10 +15,23 @@ class FinanceScreen extends StatefulWidget {
   State<FinanceScreen> createState() => _FinanceScreenState();
 }
 
+// ─── Peta Kategori: nama → (ikon, warna) ───────────────────────────────────
+const Map<String, Map<String, dynamic>> kCategoryMeta = {
+  'Food':        {'icon': Icons.restaurant,      'color': Color(0xFFFF7043)},
+  'Transport':   {'icon': Icons.directions_car,  'color': Color(0xFF42A5F5)},
+  'Shopping':    {'icon': Icons.shopping_bag,    'color': Color(0xFFAB47BC)},
+  'Health':      {'icon': Icons.favorite,        'color': Color(0xFFEF5350)},
+  'Education':   {'icon': Icons.school,          'color': Color(0xFF26A69A)},
+  'Entertainment':{'icon': Icons.sports_esports, 'color': Color(0xFFFFCA28)},
+  'Saving':      {'icon': Icons.savings,         'color': Color(0xFF66BB6A)},
+  'Other':       {'icon': Icons.category,        'color': Color(0xFF78909C)},
+};
+
 class _FinanceScreenState extends State<FinanceScreen> {
   final _supabase = Supabase.instance.client;
   List<Map<String, dynamic>> _transactions = [];
   bool _isLoading = true;
+  String _selectedFilter = 'All'; // filter kategori aktif
 
   int _totalIncome = 0;
   int _totalExpense = 0;
@@ -116,10 +129,19 @@ class _FinanceScreenState extends State<FinanceScreen> {
     if (confirmed == true) _deleteTransaction(id);
   }
 
+  // Kembalikan kategori yang sesuai dari data lama (fallback ke 'Other')
+  String _normalizeCategory(String raw) {
+    final match = kCategoryMeta.keys.firstWhere(
+      (k) => k.toLowerCase() == raw.toLowerCase(),
+      orElse: () => 'Other',
+    );
+    return match;
+  }
+
   void _showAddTransactionDialog() {
     final titleController = TextEditingController();
     final amountController = TextEditingController();
-    final categoryController = TextEditingController();
+    String selectedCategory = 'Food'; // default dropdown
     String selectedType = 'expense';
     // Simpan messenger SEBELUM dialog terbuka agar SnackBar muncul di depan
     final messenger = ScaffoldMessenger.of(context);
@@ -245,22 +267,47 @@ class _FinanceScreenState extends State<FinanceScreen> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    TextField(
-                      controller: categoryController,
-                      style: GoogleFonts.plusJakartaSans(),
-                      decoration: const InputDecoration(
-                        labelText: 'Category (e.g. Food)',
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: AppColors.primary,
-                            width: 2,
+                    // ── Dropdown Kategori ──
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: AppColors.primary, width: 2),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          isExpanded: true,
+                          value: selectedCategory,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 14,
+                            color: AppColors.onSurface,
                           ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: AppColors.primary,
-                            width: 4,
-                          ),
+                          dropdownColor: AppColors.surface,
+                          icon: const Icon(Icons.arrow_drop_down, color: AppColors.primary),
+                          onChanged: (val) {
+                            if (val != null) setDialogState(() => selectedCategory = val);
+                          },
+                          items: kCategoryMeta.entries.map((entry) {
+                            final meta = entry.value;
+                            return DropdownMenuItem<String>(
+                              value: entry.key,
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 28,
+                                    height: 28,
+                                    decoration: BoxDecoration(
+                                      color: (meta['color'] as Color).withOpacity(0.2),
+                                      border: Border.all(color: meta['color'] as Color, width: 1),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: Icon(meta['icon'] as IconData, size: 16, color: meta['color'] as Color),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(entry.key, style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600)),
+                                ],
+                              ),
+                            );
+                          }).toList(),
                         ),
                       ),
                     ),
@@ -286,10 +333,10 @@ class _FinanceScreenState extends State<FinanceScreen> {
                   onPressed: () async {
                     final title = titleController.text.trim();
                     final amountText = amountController.text.trim();
-                    final category = categoryController.text.trim();
+                    final category = selectedCategory;
 
                     // Validasi: form kosong
-                    if (title.isEmpty || amountText.isEmpty || category.isEmpty) {
+                    if (title.isEmpty || amountText.isEmpty) {
                       LilySnackBar.showWithMessenger(
                         messenger,
                         message: 'Semua kolom harus diisi terlebih dahulu!',
@@ -799,71 +846,94 @@ class _FinanceScreenState extends State<FinanceScreen> {
 
                 const SizedBox(height: 16),
 
-                // Recent Activity
+                // Recent Activity Header
                 Container(
                   decoration: const BoxDecoration(
                     border: Border(
-                      bottom: BorderSide(
-                        color: AppColors.outlineVariant,
-                        width: 2,
-                      ),
+                      bottom: BorderSide(color: AppColors.outlineVariant, width: 2),
                     ),
                   ),
                   padding: const EdgeInsets.only(bottom: 12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  child: Text(
+                    'RECENT ACTIVITY',
+                    style: GoogleFonts.silkscreen(fontSize: 20, color: AppColors.primary),
+                  ),
+                ),
+                const SizedBox(height: 10),
+
+                // ── Filter Horizontal ──────────────────────────────────────
+                SizedBox(
+                  height: 36,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
                     children: [
-                      Text(
-                        'RECENT ACTIVITY',
-                        style: GoogleFonts.silkscreen(
-                          fontSize: 20,
-                          color: AppColors.primary,
-                        ),
+                      // Chip "All"
+                      _buildFilterChip('All', Icons.grid_view, const Color(0xFF455A64)),
+                      ...kCategoryMeta.entries.map(
+                        (e) => _buildFilterChip(e.key, e.value['icon'] as IconData, e.value['color'] as Color),
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 8),
 
-                // Transaction items
-                if (_transactions.isEmpty)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 24),
-                    child: Center(
-                      child: Text(
-                        'No transactions yet.\nAdd one using the + button.',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.plusJakartaSans(
-                          color: AppColors.onSurfaceVariant,
+                // Transaction items (filtered)
+                Builder(builder: (_) {
+                  final filtered = _selectedFilter == 'All'
+                      ? _transactions
+                      : _transactions.where((t) {
+                          final cat = _normalizeCategory(t['category'] ?? '');
+                          return cat == _selectedFilter;
+                        }).toList();
+
+                  if (_transactions.isEmpty) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 24),
+                      child: Center(
+                        child: Text(
+                          'No transactions yet.\nAdd one using the + button.',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.plusJakartaSans(color: AppColors.onSurfaceVariant),
                         ),
                       ),
-                    ),
-                  )
-                else
-                  ..._transactions.map((t) {
-                    final isIncome = t['transaction_type'] == 'income';
-                    final amountStr =
-                        '${isIncome ? '+' : '-'} ${_formatCurrency((t['amount'] as num).toInt())}';
-                    final date = DateTime.parse(
-                      t['transaction_date'],
-                    ).toLocal();
-                    final dateStr = DateFormat('MMM d, HH:mm').format(date);
-
-                    return _buildTransactionItem(
-                      icon: isIncome ? Icons.work : Icons.restaurant,
-                      iconBg: isIncome
-                          ? AppColors.primaryContainer
-                          : AppColors.secondaryContainer,
-                      iconColor: isIncome
-                          ? AppColors.onPrimaryContainer
-                          : AppColors.onSecondaryContainer,
-                      title: t['title'] ?? 'Unknown',
-                      subtitle: '${t['category']} • $dateStr',
-                      amount: amountStr,
-                      isIncome: isIncome,
-                      onDelete: () => _confirmDeleteTransaction(t['id'].toString()),
                     );
-                  }),
+                  }
+                  if (filtered.isEmpty) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 24),
+                      child: Center(
+                        child: Text(
+                          'Tidak ada transaksi di kategori $_selectedFilter.',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.plusJakartaSans(color: AppColors.onSurfaceVariant),
+                        ),
+                      ),
+                    );
+                  }
+                  return Column(
+                    children: filtered.map((t) {
+                      final isIncome = t['transaction_type'] == 'income';
+                      final amountStr = '${isIncome ? '+' : '-'} ${_formatCurrency((t['amount'] as num).toInt())}';
+                      final date = DateTime.parse(t['transaction_date']).toLocal();
+                      final dateStr = DateFormat('MMM d, HH:mm').format(date);
+                      final catKey = _normalizeCategory(t['category'] ?? '');
+                      final meta = kCategoryMeta[catKey]!;
+
+                      return _buildTransactionItem(
+                        icon: meta['icon'] as IconData,
+                        iconBg: (meta['color'] as Color).withOpacity(0.15),
+                        iconColor: meta['color'] as Color,
+                        category: catKey,
+                        categoryColor: meta['color'] as Color,
+                        title: t['title'] ?? 'Unknown',
+                        dateStr: dateStr,
+                        amount: amountStr,
+                        isIncome: isIncome,
+                        onDelete: () => _confirmDeleteTransaction(t['id'].toString()),
+                      );
+                    }).toList(),
+                  );
+                }),
 
                 const SizedBox(height: 16),
 
@@ -931,27 +1001,71 @@ class _FinanceScreenState extends State<FinanceScreen> {
           );
   }
 
+  // ── Filter Chip Widget ───────────────────────────────────────────────────
+  Widget _buildFilterChip(String label, IconData icon, Color color) {
+    final isSelected = _selectedFilter == label;
+    return GestureDetector(
+      onTap: () => setState(() => _selectedFilter = label),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        margin: const EdgeInsets.only(right: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? color : color.withOpacity(0.1),
+          border: Border.all(color: color, width: isSelected ? 2 : 1),
+          borderRadius: BorderRadius.circular(4),
+          boxShadow: isSelected
+              ? [BoxShadow(color: color.withOpacity(0.4), offset: const Offset(2, 2), blurRadius: 0)]
+              : null,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 14, color: isSelected ? Colors.white : color),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: isSelected ? Colors.white : color,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ── Transaction Item Widget ──────────────────────────────────────────────
   Widget _buildTransactionItem({
     required IconData icon,
     required Color iconBg,
     required Color iconColor,
+    required String category,
+    required Color categoryColor,
     required String title,
-    required String subtitle,
+    required String dateStr,
     required String amount,
     required bool isIncome,
     required VoidCallback onDelete,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          // Ikon Kategori
           Container(
             width: 48,
             height: 48,
             decoration: BoxDecoration(
               color: iconBg,
-              border: Border.all(color: AppColors.primary, width: 2),
+              border: Border.all(color: categoryColor, width: 2),
               borderRadius: BorderRadius.circular(4),
+              boxShadow: [
+                BoxShadow(color: categoryColor.withOpacity(0.3), offset: const Offset(2, 2), blurRadius: 0),
+              ],
             ),
             child: Icon(icon, color: iconColor, size: 24),
           ),
@@ -963,38 +1077,59 @@ class _FinanceScreenState extends State<FinanceScreen> {
                 Text(
                   title,
                   style: GoogleFonts.plusJakartaSans(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
                     color: AppColors.onSurface,
                   ),
+                  overflow: TextOverflow.ellipsis,
                 ),
-                Text(
-                  subtitle,
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.onSurfaceVariant,
-                    letterSpacing: 0.6,
-                  ),
+                const SizedBox(height: 3),
+                Row(
+                  children: [
+                    // ── Badge Kategori ──
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: categoryColor.withOpacity(0.15),
+                        border: Border.all(color: categoryColor, width: 1),
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                      child: Text(
+                        category,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: categoryColor,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      dateStr,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 11,
+                        color: AppColors.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
+          const SizedBox(width: 8),
           Text(
             amount,
             style: GoogleFonts.plusJakartaSans(
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: FontWeight.w700,
               color: isIncome ? AppColors.primary : AppColors.error,
             ),
           ),
           IconButton(
-            icon: const Icon(
-              Icons.delete_outline,
-              color: AppColors.error,
-              size: 20,
-            ),
+            icon: const Icon(Icons.delete_outline, color: AppColors.error, size: 20),
             onPressed: onDelete,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
           ),
         ],
       ),
