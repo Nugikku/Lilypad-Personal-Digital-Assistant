@@ -231,10 +231,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final titleController = TextEditingController();
     final timeController = TextEditingController();
     final locationController = TextEditingController();
+    // Simpan messenger SEBELUM dialog terbuka agar SnackBar muncul di depan
+    final messenger = ScaffoldMessenger.of(context);
 
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return AlertDialog(
           backgroundColor: AppColors.surface,
           shape: const RoundedRectangleBorder(
@@ -347,10 +349,19 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
                 // Validasi: judul kosong
                 if (title.isEmpty) {
-                  LilySnackBar.show(
-                    context,
-                    message: 'Judul acara tidak boleh kosong!',
-                    isSuccess: false,
+                  messenger.hideCurrentSnackBar();
+                  messenger.showSnackBar(
+                    SnackBar(
+                      backgroundColor: AppColors.errorContainer,
+                      behavior: SnackBarBehavior.floating,
+                      content: Row(
+                        children: [
+                          const Icon(Icons.warning_amber_rounded, color: AppColors.error),
+                          const SizedBox(width: 8),
+                          const Expanded(child: Text('Judul acara tidak boleh kosong!')),
+                        ],
+                      ),
+                    ),
                   );
                   return;
                 }
@@ -362,7 +373,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 );
                 final dateStr = DateFormat('yyyy-MM-dd').format(eventDate);
 
-                Navigator.pop(context);
+                Navigator.pop(dialogContext);
                 setState(() => _isLoading = true);
                 try {
                   await _supabase.from('schedules').insert({
@@ -373,22 +384,36 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     'user_id': _supabase.auth.currentUser!.id,
                   });
                   _fetchSchedules();
-                  if (mounted) {
-                    LilySnackBar.show(
-                      context,
-                      message: 'Jadwal berhasil disimpan!',
-                      isSuccess: true,
-                    );
-                  }
+                  messenger.hideCurrentSnackBar();
+                  messenger.showSnackBar(
+                    SnackBar(
+                      backgroundColor: AppColors.primaryContainer,
+                      behavior: SnackBarBehavior.floating,
+                      content: Row(
+                        children: [
+                          const Icon(Icons.check_circle_outline, color: AppColors.primary),
+                          const SizedBox(width: 8),
+                          const Expanded(child: Text('Jadwal berhasil disimpan!')),
+                        ],
+                      ),
+                    ),
+                  );
                 } catch (e) {
                   setState(() => _isLoading = false);
-                  if (mounted) {
-                    LilySnackBar.show(
-                      context,
-                      message: 'Gagal menyimpan jadwal. Silakan coba lagi.',
-                      isSuccess: false,
-                    );
-                  }
+                  messenger.hideCurrentSnackBar();
+                  messenger.showSnackBar(
+                    SnackBar(
+                      backgroundColor: AppColors.errorContainer,
+                      behavior: SnackBarBehavior.floating,
+                      content: Row(
+                        children: [
+                          const Icon(Icons.warning_amber_rounded, color: AppColors.error),
+                          const SizedBox(width: 8),
+                          const Expanded(child: Text('Gagal menyimpan jadwal. Silakan coba lagi.')),
+                        ],
+                      ),
+                    ),
+                  );
                 }
               },
               child: Text(
