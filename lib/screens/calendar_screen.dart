@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../theme/app_colors.dart';
@@ -278,8 +279,16 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 TextField(
                   controller: timeController,
                   style: GoogleFonts.plusJakartaSans(),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(
+                      RegExp(r'[0-9: AaMmPp]'),
+                    ),
+                    LengthLimitingTextInputFormatter(8),
+                  ],
                   decoration: const InputDecoration(
                     labelText: 'Time (e.g. 10:00 AM)',
+                    hintText: '10:00 AM',
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(
                         color: AppColors.primary,
@@ -334,34 +343,51 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 ),
               ),
               onPressed: () async {
-                final title = titleController.text;
-                if (title.isNotEmpty) {
-                  final eventDate = DateTime(
-                    currentMonth.year,
-                    currentMonth.month,
-                    selectedDay,
-                  );
-                  // Format to YYYY-MM-DD
-                  final dateStr = DateFormat('yyyy-MM-dd').format(eventDate);
+                final title = titleController.text.trim();
 
-                  Navigator.pop(context);
-                  setState(() => _isLoading = true);
-                  try {
-                    await _supabase.from('schedules').insert({
-                      'title': title,
-                      'event_date': dateStr,
-                      'event_time': timeController.text,
-                      'location': locationController.text,
-                      'user_id': _supabase.auth.currentUser!.id,
-                    });
-                    _fetchSchedules();
-                  } catch (e) {
-                    setState(() => _isLoading = false);
-                    if (mounted) {
-                      ScaffoldMessenger.of(
-                        context,
-                      ).showSnackBar(SnackBar(content: Text('Error: $e')));
-                    }
+                // Validasi: judul kosong
+                if (title.isEmpty) {
+                  LilySnackBar.show(
+                    context,
+                    message: 'Judul acara tidak boleh kosong!',
+                    isSuccess: false,
+                  );
+                  return;
+                }
+
+                final eventDate = DateTime(
+                  currentMonth.year,
+                  currentMonth.month,
+                  selectedDay,
+                );
+                final dateStr = DateFormat('yyyy-MM-dd').format(eventDate);
+
+                Navigator.pop(context);
+                setState(() => _isLoading = true);
+                try {
+                  await _supabase.from('schedules').insert({
+                    'title': title,
+                    'event_date': dateStr,
+                    'event_time': timeController.text.trim(),
+                    'location': locationController.text.trim(),
+                    'user_id': _supabase.auth.currentUser!.id,
+                  });
+                  _fetchSchedules();
+                  if (mounted) {
+                    LilySnackBar.show(
+                      context,
+                      message: 'Jadwal berhasil disimpan!',
+                      isSuccess: true,
+                    );
+                  }
+                } catch (e) {
+                  setState(() => _isLoading = false);
+                  if (mounted) {
+                    LilySnackBar.show(
+                      context,
+                      message: 'Gagal menyimpan jadwal. Silakan coba lagi.',
+                      isSuccess: false,
+                    );
                   }
                 }
               },
