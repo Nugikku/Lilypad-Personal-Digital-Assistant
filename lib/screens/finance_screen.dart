@@ -282,34 +282,58 @@ class _FinanceScreenState extends State<FinanceScreen> {
                     ),
                   ),
                   onPressed: () async {
-                    final title = titleController.text;
-                    final amountText = amountController.text;
-                    final category = categoryController.text;
+                    final title = titleController.text.trim();
+                    final amountText = amountController.text.trim();
+                    final category = categoryController.text.trim();
 
-                    if (title.isNotEmpty &&
-                        amountText.isNotEmpty &&
-                        category.isNotEmpty) {
-                      final amount = int.tryParse(amountText);
-                      if (amount != null) {
-                        Navigator.pop(context);
-                        setState(() => _isLoading = true);
-                        try {
-                          await _supabase.from('transactions').insert({
-                            'title': title,
-                            'amount': amount,
-                            'category': category,
-                            'transaction_type': selectedType,
-                            'user_id': _supabase.auth.currentUser!.id,
-                          });
-                          _fetchTransactions();
-                        } catch (e) {
-                          setState(() => _isLoading = false);
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Error: $e')),
-                            );
-                          }
-                        }
+                    // Validasi: form kosong
+                    if (title.isEmpty || amountText.isEmpty || category.isEmpty) {
+                      LilySnackBar.show(
+                        context,
+                        message: 'Semua kolom harus diisi terlebih dahulu!',
+                        isSuccess: false,
+                      );
+                      return;
+                    }
+
+                    // Validasi: amount bukan angka
+                    final amount = int.tryParse(amountText);
+                    if (amount == null) {
+                      LilySnackBar.show(
+                        context,
+                        message: 'Jumlah harus berupa angka yang valid!',
+                        isSuccess: false,
+                      );
+                      return;
+                    }
+
+                    // Simpan transaksi
+                    Navigator.pop(context);
+                    setState(() => _isLoading = true);
+                    try {
+                      await _supabase.from('transactions').insert({
+                        'title': title,
+                        'amount': amount,
+                        'category': category,
+                        'transaction_type': selectedType,
+                        'user_id': _supabase.auth.currentUser!.id,
+                      });
+                      _fetchTransactions();
+                      if (mounted) {
+                        LilySnackBar.show(
+                          context,
+                          message: 'Transaksi berhasil disimpan!',
+                          isSuccess: true,
+                        );
+                      }
+                    } catch (e) {
+                      setState(() => _isLoading = false);
+                      if (mounted) {
+                        LilySnackBar.show(
+                          context,
+                          message: 'Gagal menyimpan transaksi. Silakan coba lagi.',
+                          isSuccess: false,
+                        );
                       }
                     }
                   },
