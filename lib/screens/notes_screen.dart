@@ -101,10 +101,12 @@ class _NotesScreenState extends State<NotesScreen> {
   void _showAddNoteDialog() {
     final titleController = TextEditingController();
     final bodyController = TextEditingController();
+    // Simpan messenger SEBELUM dialog terbuka agar SnackBar muncul di depan
+    final messenger = ScaffoldMessenger.of(context);
 
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return AlertDialog(
           backgroundColor: AppColors.surface,
           shape: const RoundedRectangleBorder(
@@ -139,7 +141,7 @@ class _NotesScreenState extends State<NotesScreen> {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(dialogContext),
               child: Text('CANCEL', style: GoogleFonts.silkscreen(color: AppColors.error)),
             ),
             ElevatedButton(
@@ -149,20 +151,40 @@ class _NotesScreenState extends State<NotesScreen> {
                 shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
               ),
               onPressed: () async {
-                final title = titleController.text;
-                final body = bodyController.text;
-                if (title.isNotEmpty) {
-                  Navigator.pop(context);
-                  setState(() => _isLoading = true);
-                  try {
-                    await _supabase.from('notes').insert({'title': title, 'body': body, 'user_id': _supabase.auth.currentUser!.id});
-                    _fetchNotes();
-                  } catch (e) {
-                    setState(() => _isLoading = false);
-                    if (mounted) {
-                      LilySnackBar.show(context, message: 'Gagal menyimpan catatan. Silakan coba lagi.', isSuccess: false);
-                    }
-                  }
+                final title = titleController.text.trim();
+                final body = bodyController.text.trim();
+
+                // Validasi: judul kosong
+                if (title.isEmpty) {
+                  LilySnackBar.showWithMessenger(
+                    messenger,
+                    message: 'Judul catatan tidak boleh kosong!',
+                    isSuccess: false,
+                  );
+                  return;
+                }
+
+                Navigator.pop(dialogContext);
+                setState(() => _isLoading = true);
+                try {
+                  await _supabase.from('notes').insert({
+                    'title': title,
+                    'body': body,
+                    'user_id': _supabase.auth.currentUser!.id,
+                  });
+                  _fetchNotes();
+                  LilySnackBar.showWithMessenger(
+                    messenger,
+                    message: 'Catatan berhasil disimpan!',
+                    isSuccess: true,
+                  );
+                } catch (e) {
+                  setState(() => _isLoading = false);
+                  LilySnackBar.showWithMessenger(
+                    messenger,
+                    message: 'Gagal menyimpan catatan. Silakan coba lagi.',
+                    isSuccess: false,
+                  );
                 }
               },
               child: Text('SAVE', style: GoogleFonts.silkscreen(color: AppColors.primary)),
@@ -177,10 +199,12 @@ class _NotesScreenState extends State<NotesScreen> {
     final titleController = TextEditingController(text: note['title'] ?? '');
     final bodyController = TextEditingController(text: note['body'] ?? '');
     final noteId = note['id'].toString();
+    // Simpan messenger SEBELUM dialog terbuka agar SnackBar muncul di depan
+    final messenger = ScaffoldMessenger.of(context);
 
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return AlertDialog(
           backgroundColor: AppColors.surface,
           shape: const RoundedRectangleBorder(
@@ -215,7 +239,7 @@ class _NotesScreenState extends State<NotesScreen> {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(dialogContext),
               child: Text('CANCEL', style: GoogleFonts.silkscreen(color: AppColors.error)),
             ),
             ElevatedButton(
@@ -225,20 +249,36 @@ class _NotesScreenState extends State<NotesScreen> {
                 shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
               ),
               onPressed: () async {
-                final title = titleController.text;
-                final body = bodyController.text;
-                if (title.isNotEmpty) {
-                  Navigator.pop(context);
-                  setState(() => _isLoading = true);
-                  try {
-                    await _supabase.from('notes').update({'title': title, 'body': body}).eq('id', noteId);
-                    _fetchNotes();
-                  } catch (e) {
-                    setState(() => _isLoading = false);
-                    if (mounted) {
-                      LilySnackBar.show(context, message: 'Gagal mengubah catatan. Silakan coba lagi.', isSuccess: false);
-                    }
-                  }
+                final title = titleController.text.trim();
+                final body = bodyController.text.trim();
+
+                // Validasi: judul kosong
+                if (title.isEmpty) {
+                  LilySnackBar.showWithMessenger(
+                    messenger,
+                    message: 'Judul catatan tidak boleh kosong!',
+                    isSuccess: false,
+                  );
+                  return;
+                }
+
+                Navigator.pop(dialogContext);
+                setState(() => _isLoading = true);
+                try {
+                  await _supabase.from('notes').update({'title': title, 'body': body}).eq('id', noteId);
+                  _fetchNotes();
+                  LilySnackBar.showWithMessenger(
+                    messenger,
+                    message: 'Catatan berhasil diperbarui!',
+                    isSuccess: true,
+                  );
+                } catch (e) {
+                  setState(() => _isLoading = false);
+                  LilySnackBar.showWithMessenger(
+                    messenger,
+                    message: 'Gagal mengubah catatan. Silakan coba lagi.',
+                    isSuccess: false,
+                  );
                 }
               },
               child: Text('UPDATE', style: GoogleFonts.silkscreen(color: AppColors.primary)),
