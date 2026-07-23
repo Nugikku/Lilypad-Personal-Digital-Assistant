@@ -91,6 +91,9 @@ class _FinanceScreenState extends State<FinanceScreen> {
     try {
       await _supabase.from('transactions').delete().eq('id', id);
       _fetchTransactions();
+      if (mounted) {
+        LilySnackBar.show(context, message: 'Transaksi berhasil dihapus!', isSuccess: true);
+      }
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
@@ -98,6 +101,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
       }
     }
   }
+
 
   Future<void> _confirmDeleteTransaction(String id) async {
     final confirmed = await showDialog<bool>(

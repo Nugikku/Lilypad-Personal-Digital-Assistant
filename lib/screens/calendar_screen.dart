@@ -162,6 +162,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
     try {
       await _supabase.from('schedules').delete().eq('id', id);
       _fetchSchedules();
+      if (mounted) {
+        LilySnackBar.show(context, message: 'Jadwal berhasil dihapus!', isSuccess: true);
+      }
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
@@ -173,6 +176,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
       }
     }
   }
+
 
   Future<void> _saveHolidayToDB(Map<String, dynamic> event) async {
     setState(() => _isLoading = true);

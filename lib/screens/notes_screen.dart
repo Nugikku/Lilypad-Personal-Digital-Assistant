@@ -60,6 +60,9 @@ class _NotesScreenState extends State<NotesScreen> {
     try {
       await _supabase.from('notes').delete().eq('id', id);
       _fetchNotes();
+      if (mounted) {
+        LilySnackBar.show(context, message: 'Catatan berhasil dihapus!', isSuccess: true);
+      }
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
@@ -67,6 +70,7 @@ class _NotesScreenState extends State<NotesScreen> {
       }
     }
   }
+
 
   Future<void> _confirmDeleteNote(String id) async {
     final confirmed = await showDialog<bool>(
