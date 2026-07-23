@@ -634,94 +634,100 @@ class _FinanceScreenState extends State<FinanceScreen> {
                 PixelContainer(
                   backgroundColor: AppColors.primaryContainer,
                   padding: const EdgeInsets.all(20),
-                  child: Stack(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      // Label
+                      Row(
                         children: [
+                          const Icon(
+                            Icons.account_balance_wallet,
+                            size: 14,
+                            color: AppColors.onPrimaryContainer,
+                          ),
+                          const SizedBox(width: 6),
                           Text(
                             'TOTAL SALDO',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.onPrimaryContainer,
-                              letterSpacing: 0.6,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            _formatCurrency(totalSaldo),
                             style: GoogleFonts.silkscreen(
-                              fontSize: 28,
-                              color: AppColors.onPrimaryFixed,
+                              fontSize: 11,
+                              color: AppColors.onPrimaryContainer,
+                              letterSpacing: 1,
                             ),
                           ),
-                          const SizedBox(height: 24),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      // Jumlah Saldo
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          _formatCurrency(totalSaldo),
+                          style: GoogleFonts.silkscreen(
+                            fontSize: 30,
+                            color: AppColors.onPrimaryFixed,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // Divider retro
+                      Container(
+                        height: 3,
+                        decoration: const BoxDecoration(
+                          color: AppColors.onPrimaryContainer,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      // Bottom row: label + tombol +
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Row(
-                                children: [
-                                  const Icon(
-                                    Icons.trending_up,
-                                    size: 16,
-                                    color: AppColors.onPrimaryContainer,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    'Dynamic balance',
-                                    style: GoogleFonts.plusJakartaSans(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColors.onPrimaryContainer,
-                                      letterSpacing: 0.6,
-                                    ),
-                                  ),
-                                ],
+                              const Icon(
+                                Icons.trending_up,
+                                size: 16,
+                                color: AppColors.onPrimaryContainer,
                               ),
-                              GestureDetector(
-                                onTap: _showAddTransactionDialog,
-                                child: Container(
-                                  width: 40,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    color: AppColors.surface,
-                                    border: Border.all(
-                                      color: AppColors.primary,
-                                      width: 2,
-                                    ),
-                                    boxShadow: const [
-                                      BoxShadow(
-                                        color: AppColors.primary,
-                                        offset: Offset(2, 2),
-                                        blurRadius: 0,
-                                      ),
-                                    ],
-                                  ),
-                                  child: const Icon(
-                                    Icons.add,
-                                    color: AppColors.primary,
-                                    size: 20,
-                                  ),
+                              const SizedBox(width: 6),
+                              Text(
+                                'Dynamic balance',
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.onPrimaryContainer,
                                 ),
                               ),
                             ],
                           ),
-                        ],
-                      ),
-                      Positioned(
-                        right: -16,
-                        bottom: -16,
-                        child: IgnorePointer(
-                          child: Opacity(
-                            opacity: 0.2,
-                            child: Icon(
-                              Icons.payments,
-                              size: 100,
-                              color: AppColors.onPrimaryFixed,
+                          GestureDetector(
+                            onTap: _showAddTransactionDialog,
+                            child: Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: AppColors.surface,
+                                border: Border.all(
+                                  color: AppColors.onPrimaryFixed,
+                                  width: 3,
+                                ),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: AppColors.onPrimaryFixed,
+                                    offset: Offset(3, 3),
+                                    blurRadius: 0,
+                                  ),
+                                ],
+                              ),
+                              child: const Icon(
+                                Icons.add,
+                                color: AppColors.primary,
+                                size: 22,
+                              ),
                             ),
                           ),
-                        ),
+                        ],
                       ),
                     ],
                   ),
