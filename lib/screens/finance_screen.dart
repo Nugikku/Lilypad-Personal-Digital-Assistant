@@ -290,19 +290,10 @@ class _FinanceScreenState extends State<FinanceScreen> {
 
                     // Validasi: form kosong
                     if (title.isEmpty || amountText.isEmpty || category.isEmpty) {
-                      messenger.hideCurrentSnackBar();
-                      messenger.showSnackBar(
-                        SnackBar(
-                          backgroundColor: AppColors.errorContainer,
-                          behavior: SnackBarBehavior.floating,
-                          content: Row(
-                            children: [
-                              const Icon(Icons.warning_amber_rounded, color: AppColors.error),
-                              const SizedBox(width: 8),
-                              const Expanded(child: Text('Semua kolom harus diisi terlebih dahulu!')),
-                            ],
-                          ),
-                        ),
+                      LilySnackBar.showWithMessenger(
+                        messenger,
+                        message: 'Semua kolom harus diisi terlebih dahulu!',
+                        isSuccess: false,
                       );
                       return;
                     }
@@ -310,19 +301,10 @@ class _FinanceScreenState extends State<FinanceScreen> {
                     // Validasi: amount bukan angka
                     final amount = int.tryParse(amountText);
                     if (amount == null) {
-                      messenger.hideCurrentSnackBar();
-                      messenger.showSnackBar(
-                        SnackBar(
-                          backgroundColor: AppColors.errorContainer,
-                          behavior: SnackBarBehavior.floating,
-                          content: Row(
-                            children: [
-                              const Icon(Icons.warning_amber_rounded, color: AppColors.error),
-                              const SizedBox(width: 8),
-                              const Expanded(child: Text('Jumlah harus berupa angka yang valid!')),
-                            ],
-                          ),
-                        ),
+                      LilySnackBar.showWithMessenger(
+                        messenger,
+                        message: 'Jumlah harus berupa angka yang valid!',
+                        isSuccess: false,
                       );
                       return;
                     }
@@ -339,35 +321,17 @@ class _FinanceScreenState extends State<FinanceScreen> {
                         'user_id': _supabase.auth.currentUser!.id,
                       });
                       _fetchTransactions();
-                      messenger.hideCurrentSnackBar();
-                      messenger.showSnackBar(
-                        SnackBar(
-                          backgroundColor: AppColors.primaryContainer,
-                          behavior: SnackBarBehavior.floating,
-                          content: Row(
-                            children: [
-                              const Icon(Icons.check_circle_outline, color: AppColors.primary),
-                              const SizedBox(width: 8),
-                              const Expanded(child: Text('Transaksi berhasil disimpan!')),
-                            ],
-                          ),
-                        ),
+                      LilySnackBar.showWithMessenger(
+                        messenger,
+                        message: 'Transaksi berhasil disimpan!',
+                        isSuccess: true,
                       );
                     } catch (e) {
                       setState(() => _isLoading = false);
-                      messenger.hideCurrentSnackBar();
-                      messenger.showSnackBar(
-                        SnackBar(
-                          backgroundColor: AppColors.errorContainer,
-                          behavior: SnackBarBehavior.floating,
-                          content: Row(
-                            children: [
-                              const Icon(Icons.warning_amber_rounded, color: AppColors.error),
-                              const SizedBox(width: 8),
-                              const Expanded(child: Text('Gagal menyimpan transaksi. Silakan coba lagi.')),
-                            ],
-                          ),
-                        ),
+                      LilySnackBar.showWithMessenger(
+                        messenger,
+                        message: 'Gagal menyimpan transaksi. Silakan coba lagi.',
+                        isSuccess: false,
                       );
                     }
                   },

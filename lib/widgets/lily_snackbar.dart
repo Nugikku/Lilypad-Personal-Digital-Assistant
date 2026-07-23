@@ -4,21 +4,31 @@ import '../theme/app_colors.dart';
 import 'pixel_container.dart';
 
 class LilySnackBar {
+  // Digunakan dari luar dialog (context biasa)
   static void show(BuildContext context, {required String message, bool isSuccess = false}) {
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
-    scaffoldMessenger.hideCurrentSnackBar();
+    final messenger = ScaffoldMessenger.of(context);
+    _display(messenger, message: message, isSuccess: isSuccess);
+  }
 
-    final Color bgColor = isSuccess ? AppColors.primaryContainer : AppColors.errorContainer;
-    final Color borderColor = isSuccess ? AppColors.primary : AppColors.error;
-    final Color textColor = isSuccess ? AppColors.onPrimaryContainer : AppColors.onErrorContainer;
-    final IconData icon = isSuccess ? Icons.check_circle_outline : Icons.warning_amber_rounded;
+  // Digunakan dari dalam dialog (pakai messenger yang sudah disimpan sebelum dialog terbuka)
+  static void showWithMessenger(ScaffoldMessengerState messenger, {required String message, bool isSuccess = false}) {
+    _display(messenger, message: message, isSuccess: isSuccess);
+  }
 
-    scaffoldMessenger.showSnackBar(
+  static void _display(ScaffoldMessengerState messenger, {required String message, bool isSuccess = false}) {
+    messenger.hideCurrentSnackBar();
+
+    final Color bgColor     = isSuccess ? const Color(0xFF1B5E20) : const Color(0xFFB71C1C);
+    final Color borderColor = isSuccess ? const Color(0xFF4CAF50) : const Color(0xFFEF5350);
+    final Color textColor   = Colors.white;
+    final IconData icon     = isSuccess ? Icons.check_circle : Icons.warning_rounded;
+
+    messenger.showSnackBar(
       SnackBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         behavior: SnackBarBehavior.floating,
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         duration: const Duration(seconds: 4),
         content: PixelContainer(
           borderColor: borderColor,

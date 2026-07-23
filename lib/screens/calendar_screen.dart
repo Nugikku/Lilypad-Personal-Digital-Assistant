@@ -368,24 +368,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
                 // Validasi: judul kosong
                 if (title.isEmpty) {
-                  messenger.hideCurrentSnackBar();
-                  messenger.showSnackBar(
-                    SnackBar(
-                      backgroundColor: AppColors.errorContainer,
-                      behavior: SnackBarBehavior.floating,
-                      content: Row(
-                        children: [
-                          const Icon(
-                            Icons.warning_amber_rounded,
-                            color: AppColors.error,
-                          ),
-                          const SizedBox(width: 8),
-                          const Expanded(
-                            child: Text('Judul acara tidak boleh kosong!'),
-                          ),
-                        ],
-                      ),
-                    ),
+                  LilySnackBar.showWithMessenger(
+                    messenger,
+                    message: 'Judul acara tidak boleh kosong!',
+                    isSuccess: false,
                   );
                   return;
                 }
@@ -408,47 +394,17 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     'user_id': _supabase.auth.currentUser!.id,
                   });
                   _fetchSchedules();
-                  messenger.hideCurrentSnackBar();
-                  messenger.showSnackBar(
-                    SnackBar(
-                      backgroundColor: AppColors.primaryContainer,
-                      behavior: SnackBarBehavior.floating,
-                      content: Row(
-                        children: [
-                          const Icon(
-                            Icons.check_circle_outline,
-                            color: AppColors.primary,
-                          ),
-                          const SizedBox(width: 8),
-                          const Expanded(
-                            child: Text('Jadwal berhasil disimpan!'),
-                          ),
-                        ],
-                      ),
-                    ),
+                  LilySnackBar.showWithMessenger(
+                    messenger,
+                    message: 'Jadwal berhasil disimpan!',
+                    isSuccess: true,
                   );
                 } catch (e) {
                   setState(() => _isLoading = false);
-                  messenger.hideCurrentSnackBar();
-                  messenger.showSnackBar(
-                    SnackBar(
-                      backgroundColor: AppColors.errorContainer,
-                      behavior: SnackBarBehavior.floating,
-                      content: Row(
-                        children: [
-                          const Icon(
-                            Icons.warning_amber_rounded,
-                            color: AppColors.error,
-                          ),
-                          const SizedBox(width: 8),
-                          const Expanded(
-                            child: Text(
-                              'Gagal menyimpan jadwal. Silakan coba lagi.',
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                  LilySnackBar.showWithMessenger(
+                    messenger,
+                    message: 'Gagal menyimpan jadwal. Silakan coba lagi.',
+                    isSuccess: false,
                   );
                 }
               },
