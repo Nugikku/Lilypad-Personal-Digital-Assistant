@@ -69,12 +69,17 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
       // 2. Fetch Public Holidays
       try {
-        final cacheKey = '${_selectedCountryCode}_${currentMonth.year}_${currentMonth.month}';
-        
+        final cacheKey =
+            '${_selectedCountryCode}_${currentMonth.year}_${currentMonth.month}';
+
         if (_holidayCache.containsKey(cacheKey)) {
           combinedSchedules.addAll(_holidayCache[cacheKey]!);
         } else {
-          final startOfMonth = DateTime(currentMonth.year, currentMonth.month, 1);
+          final startOfMonth = DateTime(
+            currentMonth.year,
+            currentMonth.month,
+            1,
+          );
           final endOfMonth = DateTime(
             currentMonth.year,
             currentMonth.month + 1,
@@ -143,7 +148,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
-        LilySnackBar.show(context, message: 'Gagal memuat jadwal. Silakan coba lagi.', isSuccess: false);
+        LilySnackBar.show(
+          context,
+          message: 'Gagal memuat jadwal. Silakan coba lagi.',
+          isSuccess: false,
+        );
       }
     }
   }
@@ -156,7 +165,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
-        LilySnackBar.show(context, message: 'Gagal menghapus jadwal. Silakan coba lagi.', isSuccess: false);
+        LilySnackBar.show(
+          context,
+          message: 'Gagal menghapus jadwal. Silakan coba lagi.',
+          isSuccess: false,
+        );
       }
     }
   }
@@ -173,12 +186,20 @@ class _CalendarScreenState extends State<CalendarScreen> {
       });
       _fetchSchedules();
       if (mounted) {
-        LilySnackBar.show(context, message: 'Hari Libur Disimpan ke Jadwal!', isSuccess: true);
+        LilySnackBar.show(
+          context,
+          message: 'Hari Libur Disimpan ke Jadwal!',
+          isSuccess: true,
+        );
       }
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
-        LilySnackBar.show(context, message: 'Gagal menyimpan hari libur. Silakan coba lagi.', isSuccess: false);
+        LilySnackBar.show(
+          context,
+          message: 'Gagal menyimpan hari libur. Silakan coba lagi.',
+          isSuccess: false,
+        );
       }
     }
   }
@@ -283,9 +304,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   style: GoogleFonts.plusJakartaSans(),
                   keyboardType: TextInputType.number,
                   inputFormatters: [
-                    FilteringTextInputFormatter.allow(
-                      RegExp(r'[0-9: AaMmPp]'),
-                    ),
+                    FilteringTextInputFormatter.allow(RegExp(r'[0-9: AaMmPp]')),
                     LengthLimitingTextInputFormatter(8),
                   ],
                   decoration: const InputDecoration(
@@ -356,9 +375,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       behavior: SnackBarBehavior.floating,
                       content: Row(
                         children: [
-                          const Icon(Icons.warning_amber_rounded, color: AppColors.error),
+                          const Icon(
+                            Icons.warning_amber_rounded,
+                            color: AppColors.error,
+                          ),
                           const SizedBox(width: 8),
-                          const Expanded(child: Text('Judul acara tidak boleh kosong!')),
+                          const Expanded(
+                            child: Text('Judul acara tidak boleh kosong!'),
+                          ),
                         ],
                       ),
                     ),
@@ -391,9 +415,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       behavior: SnackBarBehavior.floating,
                       content: Row(
                         children: [
-                          const Icon(Icons.check_circle_outline, color: AppColors.primary),
+                          const Icon(
+                            Icons.check_circle_outline,
+                            color: AppColors.primary,
+                          ),
                           const SizedBox(width: 8),
-                          const Expanded(child: Text('Jadwal berhasil disimpan!')),
+                          const Expanded(
+                            child: Text('Jadwal berhasil disimpan!'),
+                          ),
                         ],
                       ),
                     ),
@@ -407,9 +436,16 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       behavior: SnackBarBehavior.floating,
                       content: Row(
                         children: [
-                          const Icon(Icons.warning_amber_rounded, color: AppColors.error),
+                          const Icon(
+                            Icons.warning_amber_rounded,
+                            color: AppColors.error,
+                          ),
                           const SizedBox(width: 8),
-                          const Expanded(child: Text('Gagal menyimpan jadwal. Silakan coba lagi.')),
+                          const Expanded(
+                            child: Text(
+                              'Gagal menyimpan jadwal. Silakan coba lagi.',
+                            ),
+                          ),
                         ],
                       ),
                     ),
