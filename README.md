@@ -79,12 +79,30 @@ lilypad_app/
 
 ### 🌐 REST API (Supabase PostgREST)
 
-Aplikasi ini menggunakan **Supabase** yang secara otomatis membuatkan endpoint REST API untuk setiap tabel di database. Berikut adalah REST API yang terintegrasi dan digunakan dalam aplikasi ini:
+Aplikasi ini menggunakan **Supabase** yang secara otomatis membuatkan endpoint REST API untuk setiap tabel di database. 
 
-- **Authentication API (Supabase Auth)**: Endpoint bawaan untuk fitur pendaftaran (Register), masuk (Login), keluar (Sign Out), dan manajemen sesi pengguna.
-- **Transactions API (`transactions`)**: Endpoint untuk mengelola (GET, POST, DELETE) data riwayat pemasukan dan pengeluaran pada fitur *Finance*.
-- **Notes API (`notes`)**: Endpoint untuk membaca, membuat, memperbarui, dan menghapus catatan (GET, POST, PATCH, DELETE) pada fitur *My Notes*.
-- **Schedules API (`schedules`)**: Endpoint untuk mengatur jadwal acara di fitur *Calendar* (GET, POST, DELETE).
+**🔗 Base URL:**
+```
+https://lifbpoeqwghiuoshcoka.supabase.co/rest/v1/
+```
+
+Berikut adalah REST API yang terintegrasi dan digunakan dalam aplikasi ini:
+
+- **Authentication API (Supabase Auth)**
+  - Endpoint: `https://lifbpoeqwghiuoshcoka.supabase.co/auth/v1/`
+  - Deskripsi: Endpoint bawaan untuk fitur pendaftaran (Register), masuk (Login), keluar (Sign Out), dan manajemen sesi pengguna.
+
+- **Transactions API (`transactions`)**
+  - Endpoint: `https://lifbpoeqwghiuoshcoka.supabase.co/rest/v1/transactions`
+  - Deskripsi: Endpoint untuk mengelola (GET, POST, DELETE) data riwayat pemasukan dan pengeluaran pada fitur *Finance*.
+
+- **Notes API (`notes`)**
+  - Endpoint: `https://lifbpoeqwghiuoshcoka.supabase.co/rest/v1/notes`
+  - Deskripsi: Endpoint untuk membaca, membuat, memperbarui, dan menghapus catatan (GET, POST, PATCH, DELETE) pada fitur *My Notes*.
+
+- **Schedules API (`schedules`)**
+  - Endpoint: `https://lifbpoeqwghiuoshcoka.supabase.co/rest/v1/schedules`
+  - Deskripsi: Endpoint untuk mengatur jadwal acara di fitur *Calendar* (GET, POST, DELETE).
 
 > [!WARNING]
 > **Akses API Ketat & Terbatas**
@@ -196,12 +214,30 @@ lilypad_app/
 
 ### 🌐 REST API (Supabase PostgREST)
 
-This application utilizes **Supabase**, which automatically generates REST API endpoints for every database table. The following REST APIs are integrated into this app:
+This application utilizes **Supabase**, which automatically generates REST API endpoints for every database table. 
 
-- **Authentication API (Supabase Auth)**: Built-in endpoints for User Registration, Login, Sign Out, and session management.
-- **Transactions API (`transactions`)**: Endpoints to manage (GET, POST, DELETE) income and expense tracking data in the *Finance* feature.
-- **Notes API (`notes`)**: Endpoints for reading, creating, updating, and deleting user notes (GET, POST, PATCH, DELETE) in the *My Notes* feature.
-- **Schedules API (`schedules`)**: Endpoints for managing events in the *Calendar* feature (GET, POST, DELETE).
+**🔗 Base URL:**
+```
+https://lifbpoeqwghiuoshcoka.supabase.co/rest/v1/
+```
+
+The following REST APIs are integrated into this app:
+
+- **Authentication API (Supabase Auth)**
+  - Endpoint: `https://lifbpoeqwghiuoshcoka.supabase.co/auth/v1/`
+  - Description: Built-in endpoints for User Registration, Login, Sign Out, and session management.
+
+- **Transactions API (`transactions`)**
+  - Endpoint: `https://lifbpoeqwghiuoshcoka.supabase.co/rest/v1/transactions`
+  - Description: Endpoints to manage (GET, POST, DELETE) income and expense tracking data in the *Finance* feature.
+
+- **Notes API (`notes`)**
+  - Endpoint: `https://lifbpoeqwghiuoshcoka.supabase.co/rest/v1/notes`
+  - Description: Endpoints for reading, creating, updating, and deleting user notes (GET, POST, PATCH, DELETE) in the *My Notes* feature.
+
+- **Schedules API (`schedules`)**
+  - Endpoint: `https://lifbpoeqwghiuoshcoka.supabase.co/rest/v1/schedules`
+  - Description: Endpoints for managing events in the *Calendar* feature (GET, POST, DELETE).
 
 > [!WARNING]
 > **Strict API Access Control**
