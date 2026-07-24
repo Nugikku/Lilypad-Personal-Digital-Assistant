@@ -77,6 +77,19 @@ lilypad_app/
 - Database dilindungi oleh **Row Level Security (RLS)** — pengguna hanya bisa mengakses data miliknya sendiri
 - Google OAuth 2.0 digunakan untuk Google Sign-In yang aman
 
+### 🌐 REST API (Supabase PostgREST)
+
+Aplikasi ini menggunakan **Supabase** yang secara otomatis membuatkan endpoint REST API untuk setiap tabel di database. Berikut adalah REST API yang terintegrasi dan digunakan dalam aplikasi ini:
+
+- **Authentication API (Supabase Auth)**: Endpoint bawaan untuk fitur pendaftaran (Register), masuk (Login), keluar (Sign Out), dan manajemen sesi pengguna.
+- **Transactions API (`transactions`)**: Endpoint untuk mengelola (GET, POST, DELETE) data riwayat pemasukan dan pengeluaran pada fitur *Finance*.
+- **Notes API (`notes`)**: Endpoint untuk membaca, membuat, memperbarui, dan menghapus catatan (GET, POST, PATCH, DELETE) pada fitur *My Notes*.
+- **Schedules API (`schedules`)**: Endpoint untuk mengatur jadwal acara di fitur *Calendar* (GET, POST, DELETE).
+
+> [!WARNING]
+> **Akses API Ketat & Terbatas**
+> Endpoint REST API pada proyek ini **tidak bisa diakses atau ditembak secara bebas dari luar aplikasi** (misalnya menggunakan Postman atau browser tanpa token autentikasi yang sah). Hal ini dikarenakan seluruh tabel database dilindungi dengan sangat ketat menggunakan fitur **Row Level Security (RLS)** bawaan Supabase. Kebijakan RLS memastikan setiap proses permintaan (Request) hanya diizinkan apabila menyertakan token JWT yang valid, dan pengguna dibatasi *hanya* dapat membaca serta memodifikasi data miliknya sendiri (berdasarkan kolom `user_id`).
+
 ### ⚡ Cara Memulai
 
 **Prasyarat**
@@ -180,6 +193,19 @@ lilypad_app/
 - All secret API keys are stored in a `.env` file and **excluded from version control** via `.gitignore`
 - Database is protected by **Row Level Security (RLS)** — users can only access their own data
 - Google OAuth 2.0 is used for secure Google Sign-In
+
+### 🌐 REST API (Supabase PostgREST)
+
+This application utilizes **Supabase**, which automatically generates REST API endpoints for every database table. The following REST APIs are integrated into this app:
+
+- **Authentication API (Supabase Auth)**: Built-in endpoints for User Registration, Login, Sign Out, and session management.
+- **Transactions API (`transactions`)**: Endpoints to manage (GET, POST, DELETE) income and expense tracking data in the *Finance* feature.
+- **Notes API (`notes`)**: Endpoints for reading, creating, updating, and deleting user notes (GET, POST, PATCH, DELETE) in the *My Notes* feature.
+- **Schedules API (`schedules`)**: Endpoints for managing events in the *Calendar* feature (GET, POST, DELETE).
+
+> [!WARNING]
+> **Strict API Access Control**
+> The REST APIs in this project **cannot be accessed arbitrarily from outside the application** (e.g., using Postman or a browser without a valid authentication token). This is because all database tables are strictly protected using Supabase's built-in **Row Level Security (RLS)**. RLS policies guarantee that any database operation is only allowed if the request includes a valid JWT token, and users are strictly limited to reading and modifying only their own data (filtered by the `user_id` column).
 
 ### ⚡ Getting Started
 
