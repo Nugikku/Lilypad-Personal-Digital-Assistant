@@ -108,6 +108,23 @@ Berikut adalah REST API yang terintegrasi dan digunakan dalam aplikasi ini:
 > **Akses API Ketat & Terbatas**
 > Endpoint REST API pada proyek ini **tidak bisa diakses atau ditembak secara bebas dari luar aplikasi** (misalnya menggunakan Postman atau browser tanpa token autentikasi yang sah). Hal ini dikarenakan seluruh tabel database dilindungi dengan sangat ketat menggunakan fitur **Row Level Security (RLS)** bawaan Supabase. Kebijakan RLS memastikan setiap proses permintaan (Request) hanya diizinkan apabila menyertakan token JWT yang valid, dan pengguna dibatasi *hanya* dapat membaca serta memodifikasi data miliknya sendiri (berdasarkan kolom `user_id`).
 
+### 🌍 Layanan API Eksternal (3rd Party APIs)
+
+Selain database utama, aplikasi ini memanggil beberapa API pihak ketiga secara langsung melalui HTTP Request untuk mendukung fitur-fitur tambahan:
+
+- **Open-Meteo API (Cuaca & Pencarian Kota)**
+  - Geocoding Endpoint: `https://geocoding-api.open-meteo.com/v1/search`
+  - Forecast Endpoint: `https://api.open-meteo.com/v1/forecast`
+  - Deskripsi: Mengambil data cuaca riil dan konversi nama kota ke titik koordinat. (Tidak membutuhkan API Key).
+
+- **Google Calendar API (Hari Libur)**
+  - Endpoint: `https://www.googleapis.com/calendar/v3/calendars/{calendarId}/events`
+  - Deskripsi: Mengambil data Hari Libur Nasional Indonesia untuk ditampilkan di kalender menggunakan API Key Google Cloud.
+
+- **Google Gemini API (Asisten AI)**
+  - Endpoint: Dikelola oleh SDK `google_generative_ai` (`https://generativelanguage.googleapis.com/...`)
+  - Deskripsi: Memberikan kemampuan kecerdasan buatan pada fitur percakapan (Lily AI) menggunakan Gemini API Key.
+
 ### ⚡ Cara Memulai
 
 **Prasyarat**
@@ -242,6 +259,23 @@ The following REST APIs are integrated into this app:
 > [!WARNING]
 > **Strict API Access Control**
 > The REST APIs in this project **cannot be accessed arbitrarily from outside the application** (e.g., using Postman or a browser without a valid authentication token). This is because all database tables are strictly protected using Supabase's built-in **Row Level Security (RLS)**. RLS policies guarantee that any database operation is only allowed if the request includes a valid JWT token, and users are strictly limited to reading and modifying only their own data (filtered by the `user_id` column).
+
+### 🌍 External API Services (3rd Party APIs)
+
+In addition to the main database, this application calls several third-party APIs directly via HTTP Requests to support additional features:
+
+- **Open-Meteo API (Weather & City Search)**
+  - Geocoding Endpoint: `https://geocoding-api.open-meteo.com/v1/search`
+  - Forecast Endpoint: `https://api.open-meteo.com/v1/forecast`
+  - Description: Fetches real-time weather data and converts city names to coordinates. (No API Key required).
+
+- **Google Calendar API (Holidays)**
+  - Endpoint: `https://www.googleapis.com/calendar/v3/calendars/{calendarId}/events`
+  - Description: Fetches Indonesian National Public Holidays data to display on the calendar using a Google Cloud API Key.
+
+- **Google Gemini API (AI Assistant)**
+  - Endpoint: Managed automatically by the `google_generative_ai` SDK (`https://generativelanguage.googleapis.com/...`)
+  - Description: Powers the artificial intelligence chat feature (Lily AI) using a Gemini API Key.
 
 ### ⚡ Getting Started
 
