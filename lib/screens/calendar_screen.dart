@@ -876,6 +876,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
     }
 
     final isSelected = day == selectedDay;
+    
+    // Check if this cell is exactly "today" in real-time
+    final now = DateTime.now();
+    final isToday = currentMonth.year == now.year && currentMonth.month == now.month && day == now.day;
 
     // Check if this specific date has an event or holiday
     final dateStr = DateFormat(
@@ -895,9 +899,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
         child: Container(
           margin: const EdgeInsets.all(1),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.primaryContainer : Colors.transparent,
+            color: isSelected 
+                ? AppColors.primaryContainer 
+                : (isToday ? Colors.blueAccent.withValues(alpha: 0.15) : Colors.transparent),
             border: Border.all(
-              color: isSelected ? AppColors.primary : Colors.transparent,
+              color: isSelected 
+                  ? AppColors.primary 
+                  : (isToday ? Colors.blueAccent.withValues(alpha: 0.5) : Colors.transparent),
               width: 2,
             ),
             boxShadow: isSelected
@@ -919,10 +927,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   fontSize: 16,
                   fontWeight: isSelected
                       ? FontWeight.w700
-                      : (isHoliday ? FontWeight.w800 : FontWeight.w400),
+                      : (isToday || isHoliday ? FontWeight.w800 : FontWeight.w400),
                   color: isSelected
                       ? AppColors.primary
-                      : (isHoliday ? Colors.redAccent : AppColors.onSurface),
+                      : (isToday
+                          ? Colors.blueAccent
+                          : (isHoliday ? Colors.redAccent : AppColors.onSurface)),
                 ),
               ),
               if (hasEvent)
