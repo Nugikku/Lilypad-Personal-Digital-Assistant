@@ -306,14 +306,32 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 TextField(
                   controller: timeController,
                   style: GoogleFonts.plusJakartaSans(),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.allow(RegExp(r'[0-9: AaMmPp]')),
-                    LengthLimitingTextInputFormatter(8),
-                  ],
+                  readOnly: true, // Tidak bisa diketik manual
+                  onTap: () async {
+                    final TimeOfDay? picked = await showTimePicker(
+                      context: context,
+                      initialTime: TimeOfDay.now(),
+                      builder: (BuildContext ctx, Widget? child) {
+                        return Theme(
+                          data: Theme.of(context).copyWith(
+                            colorScheme: const ColorScheme.light(
+                              primary: AppColors.primary,
+                              surface: AppColors.surface,
+                              onSurface: AppColors.primary,
+                            ),
+                          ),
+                          child: child!,
+                        );
+                      },
+                    );
+                    if (picked != null && context.mounted) {
+                      timeController.text = picked.format(context);
+                    }
+                  },
                   decoration: const InputDecoration(
-                    labelText: 'Time (e.g. 10:00 AM)',
-                    hintText: '10:00 AM',
+                    labelText: 'Time',
+                    hintText: 'Select time...',
+                    suffixIcon: Icon(Icons.access_time, color: AppColors.primary),
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(
                         color: AppColors.primary,
