@@ -52,6 +52,107 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Future<void> _changeUsername() async {
+    // Current name from DB
+    final currentName = _user?.userMetadata?['display_name'] ?? 
+                        _user?.userMetadata?['username'] ?? 
+                        _user?.userMetadata?['full_name'] ?? 
+                        _user?.userMetadata?['name'] ?? 
+                        '';
+    final usernameController = TextEditingController(text: currentName);
+    
+    // Simpan messenger SEBELUM dialog terbuka agar SnackBar muncul di depan
+    final messenger = ScaffoldMessenger.of(context);
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: const RoundedRectangleBorder(
+          side: BorderSide(color: AppColors.primary, width: 4),
+          borderRadius: BorderRadius.zero,
+        ),
+        title: Text(
+          'GANTI USERNAME',
+          style: GoogleFonts.silkscreen(color: AppColors.primary),
+        ),
+        content: TextField(
+          controller: usernameController,
+          style: GoogleFonts.plusJakartaSans(),
+          decoration: const InputDecoration(
+            labelText: 'Username Baru',
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: AppColors.primary, width: 2),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: AppColors.primary, width: 4),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(
+              'BATAL',
+              style: GoogleFonts.silkscreen(color: AppColors.error),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primaryContainer,
+              side: const BorderSide(color: AppColors.primary, width: 2),
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.zero,
+              ),
+            ),
+            onPressed: () async {
+              final newName = usernameController.text.trim();
+              if (newName.isNotEmpty) {
+                Navigator.pop(dialogContext);
+                setState(() => _isLoading = true);
+                try {
+                  // Update Supabase Auth user metadata
+                  await _supabase.auth.updateUser(
+                    UserAttributes(
+                      data: {
+                        'display_name': newName,
+                        'username': newName,
+                        'full_name': newName,
+                      },
+                    ),
+                  );
+                  _fetchUser(); // Refresh data user
+                  LilySnackBar.showWithMessenger(
+                    messenger,
+                    message: 'Username berhasil diubah!',
+                    isSuccess: true,
+                  );
+                } catch (e) {
+                  setState(() => _isLoading = false);
+                  LilySnackBar.showWithMessenger(
+                    messenger,
+                    message: 'Gagal mengubah username: $e',
+                    isSuccess: false,
+                  );
+                }
+              } else {
+                LilySnackBar.showWithMessenger(
+                  messenger,
+                  message: 'Username tidak boleh kosong!',
+                  isSuccess: false,
+                );
+              }
+            },
+            child: Text(
+              'SIMPAN',
+              style: GoogleFonts.silkscreen(color: AppColors.primary),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _changePassword() async {
     final passwordController = TextEditingController();
 
@@ -158,6 +259,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     // Attempt to extract username or full name from metadata
     final fullName =
+        _user?.userMetadata?['display_name'] ??
         _user?.userMetadata?['username'] ??
         _user?.userMetadata?['full_name'] ??
         _user?.userMetadata?['name'] ??
@@ -299,37 +401,57 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 24),
 
             // Settings List
-            if (!isGoogleAuth) ...[
-              const Text(
-                'ACCOUNT',
-                style: TextStyle(
-                  fontFamily: 'monospace',
-                  fontSize: 18,
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.primary,
-                ),
+            const Text(
+              'ACCOUNT',
+              style: TextStyle(
+                fontFamily: 'monospace',
+                fontSize: 18,
+                fontWeight: FontWeight.w900,
+                color: AppColors.primary,
               ),
-              const SizedBox(height: 8),
-              PixelContainer(
-                padding: const EdgeInsets.all(0),
-                child: ListTile(
-                  leading: const Icon(Icons.password, color: AppColors.primary),
-                  title: Text(
-                    'Ganti Kata Sandi',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontWeight: FontWeight.w700,
+            ),
+            const SizedBox(height: 8),
+            PixelContainer(
+              padding: const EdgeInsets.all(0),
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.person, color: AppColors.primary),
+                    title: Text(
+                      'Ganti Username',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    trailing: const Icon(
+                      Icons.chevron_right,
                       color: AppColors.primary,
                     ),
+                    onTap: _changeUsername,
                   ),
-                  trailing: const Icon(
-                    Icons.chevron_right,
-                    color: AppColors.primary,
-                  ),
-                  onTap: _changePassword,
-                ),
+                  if (!isGoogleAuth) ...[
+                    const Divider(height: 1, color: AppColors.primary, thickness: 2),
+                    ListTile(
+                      leading: const Icon(Icons.password, color: AppColors.primary),
+                      title: Text(
+                        'Ganti Kata Sandi',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                      trailing: const Icon(
+                        Icons.chevron_right,
+                        color: AppColors.primary,
+                      ),
+                      onTap: _changePassword,
+                    ),
+                  ],
+                ],
               ),
-              const SizedBox(height: 24),
-            ],
+            ),
+            const SizedBox(height: 24),
 
             const Text(
               'APP SETTINGS',
