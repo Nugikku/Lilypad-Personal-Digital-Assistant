@@ -308,87 +308,137 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Mascot Dialogue
-            Container(
-              decoration: BoxDecoration(
-                color: AppColors.primaryContainer.withValues(alpha: 0.5),
-                border: Border.all(color: AppColors.primary, width: 3),
-                boxShadow: const [
-                  BoxShadow(
-                    color: AppColors.primary,
-                    offset: Offset(4, 4),
-                    blurRadius: 0,
-                  ),
-                ],
-              ),
-              padding: const EdgeInsets.all(12),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  // Mascot image with glow
-                  Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      color: AppColors.tertiaryFixed,
-                      border: Border.all(color: AppColors.primary, width: 3),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primary.withValues(alpha: 0.4),
-                          blurRadius: 12,
-                          spreadRadius: 2,
-                        ),
-                        const BoxShadow(
-                          color: AppColors.primary,
-                          offset: Offset(4, 4),
-                          blurRadius: 0,
-                        ),
+            // Mascot Dialogue — Premium Card
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        AppColors.primary,
+                        AppColors.primaryContainer,
+                        const Color(0xFF1B5E20),
                       ],
                     ),
-                    child: Image.asset(
-                      'lib/screens/assets/maskot_dash.png',
-                      fit: BoxFit.contain,
-                      errorBuilder: (_, _, _) =>
-                          const Icon(Icons.eco, color: AppColors.primary, size: 48),
-                    ),
+                    border: Border.all(color: const Color(0xFF0D2B0D), width: 4),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0xFF0D2B0D),
+                        offset: Offset(6, 6),
+                        blurRadius: 0,
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 12),
-                  // Speech bubble
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Mascot Image — large & prominent
+                      Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Container(
+                          width: 96,
+                          height: 96,
+                          decoration: BoxDecoration(
+                            color: AppColors.tertiaryFixed,
+                            border: Border.all(color: const Color(0xFF0D2B0D), width: 3),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Color(0xFF0D2B0D),
+                                offset: Offset(4, 4),
+                                blurRadius: 0,
+                              ),
+                            ],
                           ),
-                          color: AppColors.primary,
-                          child: Text(
-                            'LILY SAYS',
-                            style: GoogleFonts.silkscreen(
-                              fontSize: 10,
-                              color: AppColors.onPrimary,
-                              letterSpacing: 1,
-                            ),
+                          child: Image.asset(
+                            'lib/screens/assets/maskot_dash.png',
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) {
+                              // Debug: tampilkan error untuk diagnosis
+                              return Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(Icons.image_not_supported, color: AppColors.primary, size: 32),
+                                  const SizedBox(height: 2),
+                                  Text('!', style: GoogleFonts.silkscreen(fontSize: 8, color: AppColors.primary)),
+                                ],
+                              );
+                            },
                           ),
                         ),
-                        const SizedBox(height: 6),
-                        Text(
-                          _todaySchedules.isNotEmpty
-                              ? '"Halo $_username! Jangan lupa hari ini ada jadwal: ${_todaySchedules.first['title']}. 🐸"'
-                              : '"Halo $_username! Wah, tidak ada jadwal hari ini! Waktunya rebahan santai! 🐸"',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.onSurface,
+                      ),
+                      // Speech Bubble Section
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 14, top: 14, bottom: 14),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Badge label
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: AppColors.tertiaryFixed,
+                                  border: Border.all(color: const Color(0xFF0D2B0D), width: 2),
+                                ),
+                                child: Text(
+                                  '✦ LILY SAYS',
+                                  style: GoogleFonts.silkscreen(
+                                    fontSize: 9,
+                                    color: AppColors.primary,
+                                    letterSpacing: 1.5,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              // Message box
+                              Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: AppColors.surface.withValues(alpha: 0.9),
+                                  border: Border.all(color: const Color(0xFF0D2B0D), width: 2),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Color(0xFF0D2B0D),
+                                      offset: Offset(2, 2),
+                                      blurRadius: 0,
+                                    ),
+                                  ],
+                                ),
+                                child: Text(
+                                  _todaySchedules.isNotEmpty
+                                      ? '"Halo $_username! Jangan lupa hari ini ada jadwal: ${_todaySchedules.first['title']}. 🐸"'
+                                      : '"Halo $_username! Tidak ada jadwal hari ini — waktunya rebahan santai! 🐸"',
+                                  style: GoogleFonts.plusJakartaSans(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.primary,
+                                    height: 1.4,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+                // Corner decoration pixel dots
+                Positioned(
+                  top: 6,
+                  right: 8,
+                  child: Container(width: 6, height: 6, color: AppColors.tertiaryFixed),
+                ),
+                Positioned(
+                  bottom: 6,
+                  right: 8,
+                  child: Container(width: 6, height: 6, color: AppColors.tertiaryFixed),
+                ),
+              ],
             ),
             const SizedBox(height: 16),
 
