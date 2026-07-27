@@ -60,6 +60,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final user = _supabase.auth.currentUser;
       final isGoogleAuth = user?.appMetadata['provider'] == 'google';
       final fetchedUsername =
+          user?.userMetadata?['display_name'] ??
           user?.userMetadata?['username'] ??
           user?.userMetadata?['full_name'] ??
           user?.userMetadata?['name'] ??
@@ -308,47 +309,86 @@ class _DashboardScreenState extends State<DashboardScreen> {
             const SizedBox(height: 16),
 
             // Mascot Dialogue
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: AppColors.primary, width: 4),
-                    color: AppColors.tertiaryFixed,
-                    boxShadow: const [
-                      BoxShadow(
-                        color: AppColors.primary,
-                        offset: Offset(4, 4),
-                        blurRadius: 0,
-                      ),
-                    ],
+            Container(
+              decoration: BoxDecoration(
+                color: AppColors.primaryContainer.withValues(alpha: 0.5),
+                border: Border.all(color: AppColors.primary, width: 3),
+                boxShadow: const [
+                  BoxShadow(
+                    color: AppColors.primary,
+                    offset: Offset(4, 4),
+                    blurRadius: 0,
                   ),
-                  child: Image.network(
-                    'https://lh3.googleusercontent.com/aida-public/AB6AXuDRBCxEFUSfkWnwC4FfkvLQmH_8suXG-UDSM9qH2Aw_-CEixTiRsZJDGHl0YRdCGLrIl37FktxWS6xnGOpAKpwoJ5gDFBeL_6kBrJ_1Ax0xyc4dxKZ3VXFBBU-_Z4xw4HClXVaW6X1NZifw0WYS4dNu2J4ON11e4nNkuAH-mAV6Vx2wfN_fOy2dXsJsLG3Sw_uq6OcgxGj_xrWpJeK54l9LiUkC-oD4ENkHHv0TutTUIZZPm38WGkx8C_rFcbvNgmby-UfIMu9GFg',
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, _, _) =>
-                        const Icon(Icons.eco, color: AppColors.primary),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: PixelContainer(
-                    padding: const EdgeInsets.all(12),
-                    child: Text(
-                      _todaySchedules.isNotEmpty
-                          ? '"Halo $_username! Jangan lupa hari ini ada jadwal: ${_todaySchedules.first['title']}. 🐸"'
-                          : '"Halo $_username! Wah, tidak ada jadwal hari ini! Waktunya rebahan santai! 🐸"',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.onSurface,
-                      ),
+                ],
+              ),
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Mascot image with glow
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: AppColors.tertiaryFixed,
+                      border: Border.all(color: AppColors.primary, width: 3),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withValues(alpha: 0.4),
+                          blurRadius: 12,
+                          spreadRadius: 2,
+                        ),
+                        const BoxShadow(
+                          color: AppColors.primary,
+                          offset: Offset(4, 4),
+                          blurRadius: 0,
+                        ),
+                      ],
+                    ),
+                    child: Image.asset(
+                      'lib/screens/assets/maskot_dash.png',
+                      fit: BoxFit.contain,
+                      errorBuilder: (_, _, _) =>
+                          const Icon(Icons.eco, color: AppColors.primary, size: 48),
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 12),
+                  // Speech bubble
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          color: AppColors.primary,
+                          child: Text(
+                            'LILY SAYS',
+                            style: GoogleFonts.silkscreen(
+                              fontSize: 10,
+                              color: AppColors.onPrimary,
+                              letterSpacing: 1,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          _todaySchedules.isNotEmpty
+                              ? '"Halo $_username! Jangan lupa hari ini ada jadwal: ${_todaySchedules.first['title']}. 🐸"'
+                              : '"Halo $_username! Wah, tidak ada jadwal hari ini! Waktunya rebahan santai! 🐸"',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.onSurface,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 16),
 
